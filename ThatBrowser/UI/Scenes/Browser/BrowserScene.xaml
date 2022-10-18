@@ -1,0 +1,58 @@
+﻿<UserControl
+    x:Class="ThatBrowser.UI.Scenes.Browser.BrowserScene"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:ThatBrowser.UI.Scenes"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:browser="using:ThatBrowser.UI.Scenes.Browser"
+    mc:Ignorable="d">
+    <UserControl.DataContext>
+        <browser:BrowserViewModel/>
+    </UserControl.DataContext>
+    <Grid>
+        <SplitView 
+            PanePlacement="Right"
+            DisplayMode="CompactInline"
+            PaneBackground="Transparent"
+            Name="RootSplitView"
+            IsPaneOpen="True"
+            OpenPaneLength="256">
+            <SplitView.Pane>
+                <Grid Background="Transparent">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="32"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid Name="DraggableArea1"/>
+                    <Grid Grid.Row="2" Name="DraggableArea2"/>
+                    <ListView Grid.Row="1" ItemsSource="{Binding Tabs}" SelectedItem="{Binding SelectedTab, Mode=TwoWay}">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <TextBlock Text="{Binding Title}"/>
+                                </Grid>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </Grid>
+            </SplitView.Pane>
+            <ContentPresenter>
+                <ContentPresenter.Content>
+                    <Binding Path="SelectedTab.Content">
+                        <Binding.FallbackValue>
+                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <TextBlock>Create new tabs</TextBlock>
+                                <TextBox Text="{Binding AddressBarText, Mode=TwoWay}"/>
+                                <Button Command="{Binding AddTabCommand}">
+                                    <TextBlock Text="Go"/>
+                                </Button>
+                            </StackPanel>
+                        </Binding.FallbackValue>
+                    </Binding>
+                </ContentPresenter.Content>
+            </ContentPresenter>
+        </SplitView>
+    </Grid>
+</UserControl>
