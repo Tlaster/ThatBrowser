@@ -10,9 +10,11 @@ partial class App : Application
         this.InitializeComponent();
     }
 
+    internal static RootWindow RootWindow { get; } = new();
+
     protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
     {
-        new RootWindow().Activate();
+        RootWindow.Activate();
     }
 
 }

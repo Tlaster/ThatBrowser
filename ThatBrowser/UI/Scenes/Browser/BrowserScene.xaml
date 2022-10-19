@@ -23,15 +23,68 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="32"/>
                         <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
-                    <Grid Name="DraggableArea1"/>
-                    <Grid Grid.Row="2" Name="DraggableArea2"/>
-                    <ListView Grid.Row="1" ItemsSource="{Binding Tabs}" SelectedItem="{Binding SelectedTab, Mode=TwoWay}">
+                    <Grid HorizontalAlignment="Stretch" Loaded="OnSafeAreaElementEvent" SizeChanged="OnSafeAreaElementEvent">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition x:Name="RightPaddingColumn" Width="0"/>
+                        </Grid.ColumnDefinitions>
+                        <Rectangle Fill="Red" Name="DraggableArea1" Loaded="OnSafeAreaElementEvent" SizeChanged="OnSafeAreaElementEvent"/>
+                        <Button Grid.Column="1" x:Name="BackButton" VerticalAlignment="Stretch" Command="{Binding BackCommand}" CornerRadius="0" Style="{ThemeResource DateTimePickerFlyoutButtonStyle}">
+                            <Viewbox Width="12" Height="12">
+                                <SymbolIcon Symbol="Back"/>
+                            </Viewbox>
+                        </Button>
+                        <Button Grid.Column="2" x:Name="RefreshButton" VerticalAlignment="Stretch" Command="{Binding ReloadCommand}" CornerRadius="0" Style="{ThemeResource DateTimePickerFlyoutButtonStyle}">
+                            <Viewbox Width="12" Height="12">
+                                <SymbolIcon Symbol="Refresh"/>
+                            </Viewbox>
+                        </Button>
+                    </Grid>
+                    <Rectangle Fill="Red" Grid.Row="4" Name="DraggableArea2" Loaded="OnSafeAreaElementEvent" SizeChanged="OnSafeAreaElementEvent"/>
+                    <Button Grid.Row="5" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" Style="{ThemeResource DateTimePickerFlyoutButtonStyle}">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Padding="0 4">
+                            <Viewbox Width="12" Height="12">
+                                <SymbolIcon Symbol="Setting"/>
+                            </Viewbox>
+                            <Grid Width="8"/>
+                            <TextBlock Text="Settings"/>
+                        </StackPanel>
+                    </Button>
+                    <Grid Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="4"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Button Style="{ThemeResource DateTimePickerFlyoutButtonStyle}" VerticalAlignment="Stretch">
+                            <Viewbox Width="12" Height="12">
+                                <SymbolIcon Symbol="Add"/>
+                            </Viewbox>
+                        </Button>
+                        <TextBox Grid.Column="2"/>
+                    </Grid>
+                    <ListView Grid.Row="2" ItemsSource="{Binding Tabs}" SelectedItem="{Binding SelectedTab, Mode=TwoWay}">
                         <ListView.ItemTemplate>
                             <DataTemplate>
                                 <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
                                     <TextBlock Text="{Binding Title}"/>
+                                    <Button Grid.Column="2" Style="{ThemeResource DateTimePickerFlyoutButtonStyle}">
+                                        <Viewbox Width="12" Height="12">
+                                            <SymbolIcon Symbol="Cancel"/>
+                                        </Viewbox>
+                                    </Button>
                                 </Grid>
                             </DataTemplate>
                         </ListView.ItemTemplate>

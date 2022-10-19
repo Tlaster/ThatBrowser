@@ -22,4 +22,22 @@ partial class BrowserViewModel
         SelectedTab = tab;
         AddressBarText = string.Empty;
     }
+    
+    [RelayCommand]
+    private void Back()
+    {
+        SelectedTab?.Back();
+    }
+    
+    [RelayCommand]
+    private void Forward()
+    {
+        SelectedTab?.Forward();
+    }
+    
+    [RelayCommand]
+    private void Reload()
+    {
+        SelectedTab?.Reload();
+    }
 }

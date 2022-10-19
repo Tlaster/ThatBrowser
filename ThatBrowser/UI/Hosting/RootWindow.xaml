@@ -9,5 +9,5 @@
     xmlns:controls1="using:CommunityToolkit.WinUI.UI.Controls"
     xmlns:browser="using:ThatBrowser.UI.Scenes.Browser"
     mc:Ignorable="d">
-    <browser:BrowserScene/>
+    <browser:BrowserScene />
 </controls:ModernWindow>

@@ -17,6 +17,10 @@ internal partial class TabViewModel : IDisposable
         Content.Source = new Uri(url);
         Content.CoreWebView2Initialized += ContentOnCoreWebView2Initialized;
     }
+    
+    public void Back() => Content.GoBack();
+    public void Forward() => Content.GoForward();
+    public void Reload() => Content.Reload();
 
     private void ContentOnCoreWebView2Initialized(WebView2 sender, CoreWebView2InitializedEventArgs args)
     {
