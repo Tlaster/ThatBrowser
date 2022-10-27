@@ -26,8 +26,15 @@ internal partial class TabViewModel : IDisposable
     {
         var core = sender.CoreWebView2;
         core.Settings.IsPasswordAutosaveEnabled = true;
+        core.Settings.IsGeneralAutofillEnabled = true;
+        core.Settings.AreDefaultScriptDialogsEnabled = true;
+        core.Settings.AreDevToolsEnabled = true;
+        core.Settings.AreDefaultContextMenusEnabled = true;
+        core.Settings.AreHostObjectsAllowed = true;
+        core.Settings.AreBrowserAcceleratorKeysEnabled = true;
+        
         core.DocumentTitleChanged += CoreOnDocumentTitleChanged;
-        core.ContextMenuRequested += CoreOnContextMenuRequested;
+        // core.ContextMenuRequested += CoreOnContextMenuRequested;
         core.NewWindowRequested += CoreOnNewWindowRequested;
         core.WindowCloseRequested += CoreOnWindowCloseRequested;
         core.AddWebResourceRequestedFilter("*", CoreWebView2WebResourceContext.All);

@@ -6,6 +6,10 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:browser="using:ThatBrowser.UI.Scenes.Browser"
+    xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
+    xmlns:core="using:Microsoft.Xaml.Interactions.Core"
+    KeyDown="BrowserScene_OnKeyDown"
+    KeyUp="BrowserScene_OnKeyUp"
     mc:Ignorable="d">
     <UserControl.DataContext>
         <browser:BrowserViewModel/>
@@ -17,7 +21,7 @@
             PaneBackground="Transparent"
             Name="RootSplitView"
             IsPaneOpen="True"
-            OpenPaneLength="256">
+            OpenPaneLength="320">
             <SplitView.Pane>
                 <Grid Background="Transparent">
                     <Grid.RowDefinitions>
@@ -35,42 +39,21 @@
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition x:Name="RightPaddingColumn" Width="0"/>
                         </Grid.ColumnDefinitions>
-                        <Rectangle Fill="Red" Name="DraggableArea1" Loaded="OnSafeAreaElementEvent" SizeChanged="OnSafeAreaElementEvent"/>
-                        <Button Grid.Column="1" x:Name="BackButton" VerticalAlignment="Stretch" Command="{Binding BackCommand}" CornerRadius="0" Style="{ThemeResource DateTimePickerFlyoutButtonStyle}">
-                            <Viewbox Width="12" Height="12">
-                                <SymbolIcon Symbol="Back"/>
-                            </Viewbox>
-                        </Button>
-                        <Button Grid.Column="2" x:Name="RefreshButton" VerticalAlignment="Stretch" Command="{Binding ReloadCommand}" CornerRadius="0" Style="{ThemeResource DateTimePickerFlyoutButtonStyle}">
-                            <Viewbox Width="12" Height="12">
-                                <SymbolIcon Symbol="Refresh"/>
-                            </Viewbox>
-                        </Button>
+                        <Rectangle Fill="Transparent" Name="DraggableArea1" Loaded="OnSafeAreaElementEvent" SizeChanged="OnSafeAreaElementEvent"/>
                     </Grid>
-                    <Rectangle Fill="Red" Grid.Row="4" Name="DraggableArea2" Loaded="OnSafeAreaElementEvent" SizeChanged="OnSafeAreaElementEvent"/>
-                    <Button Grid.Row="5" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" Style="{ThemeResource DateTimePickerFlyoutButtonStyle}">
-                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Padding="0 4">
-                            <Viewbox Width="12" Height="12">
-                                <SymbolIcon Symbol="Setting"/>
-                            </Viewbox>
-                            <Grid Width="8"/>
-                            <TextBlock Text="Settings"/>
-                        </StackPanel>
-                    </Button>
-                    <Grid Grid.Row="1">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="4"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <Button Style="{ThemeResource DateTimePickerFlyoutButtonStyle}" VerticalAlignment="Stretch">
-                            <Viewbox Width="12" Height="12">
-                                <SymbolIcon Symbol="Add"/>
-                            </Viewbox>
-                        </Button>
-                        <TextBox Grid.Column="2"/>
-                    </Grid>
-                    <ListView Grid.Row="2" ItemsSource="{Binding Tabs}" SelectedItem="{Binding SelectedTab, Mode=TwoWay}">
+                    <Rectangle Fill="Transparent" Grid.Row="4" Name="DraggableArea2" Loaded="OnSafeAreaElementEvent" SizeChanged="OnSafeAreaElementEvent"/>
+                    <CommandBar IsOpen="False" DefaultLabelPosition="Collapsed" Grid.Row="1" IsDynamicOverflowEnabled="False" HorizontalAlignment="Center">
+                        <CommandBar.PrimaryCommands>
+                            <AppBarButton Icon="Back" Label="Back" Command="{Binding BackCommand}"/>
+                            <AppBarButton Icon="Forward" Label="Forward" Command="{Binding ForwardCommand}"/>
+                            <AppBarButton Icon="Refresh" Label="Refresh" Command="{Binding ReloadCommand}"/>
+                            <AppBarButton Icon="Add" Label="Add" Command="{Binding ClearSelectedTabCommand}"/>
+                        </CommandBar.PrimaryCommands>
+                        <CommandBar.SecondaryCommands>
+                            <AppBarButton Icon="Setting" Label="Settings"/>
+                        </CommandBar.SecondaryCommands>
+                    </CommandBar>
+                    <ListView AllowDrop="True" CanReorderItems="True" Grid.Row="2" ItemsSource="{Binding Tabs}" SelectedItem="{Binding SelectedTab, Mode=TwoWay}">
                         <ListView.ItemTemplate>
                             <DataTemplate>
                                 <Grid>
@@ -95,13 +78,35 @@
                 <ContentPresenter.Content>
                     <Binding Path="SelectedTab.Content">
                         <Binding.FallbackValue>
-                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                                <TextBlock>Create new tabs</TextBlock>
-                                <TextBox Text="{Binding AddressBarText, Mode=TwoWay}"/>
-                                <Button Command="{Binding AddTabCommand}">
-                                    <TextBlock Text="Go"/>
-                                </Button>
-                            </StackPanel>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="2"/>
+                                </Grid.ColumnDefinitions>
+                                <Rectangle Grid.Column="1" Fill="{ThemeResource AppBarSeparatorForeground}"/>
+                                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                    <TextBlock Text="That Browser" Style="{ThemeResource HeaderTextBlockStyle}" HorizontalAlignment="Center"/>
+                                    <Rectangle Height="32"/>
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
+                                        <AutoSuggestBox Width="400" Text="{Binding AddressBarText, Mode=TwoWay}" PlaceholderText="Search or input url...">
+                                            <AutoSuggestBox.QueryIcon>
+                                                <SymbolIcon Symbol="Find"/>
+                                            </AutoSuggestBox.QueryIcon>
+                                            <interactivity:Interaction.Behaviors>
+                                                <core:EventTriggerBehavior EventName="QuerySubmitted">
+                                                    <core:InvokeCommandAction Command="{Binding AddTabCommand}"/>
+                                                </core:EventTriggerBehavior>
+                                                <core:EventTriggerBehavior EventName="KeyDown">
+                                                    <core:InvokeCommandAction Command="{Binding OnSearchBoxKeyDownCommand}"/>
+                                                </core:EventTriggerBehavior>
+                                                <core:EventTriggerBehavior EventName="KeyUp">
+                                                    <core:InvokeCommandAction Command="{Binding OnSearchBoxKeyUpCommand}"/>
+                                                </core:EventTriggerBehavior>
+                                            </interactivity:Interaction.Behaviors>
+                                        </AutoSuggestBox>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Grid>
                         </Binding.FallbackValue>
                     </Binding>
                 </ContentPresenter.Content>

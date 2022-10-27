@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using Windows.System;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.UI.Xaml.Input;
 using ThatBrowser.UI.Hosting;
 
 namespace ThatBrowser.UI.Scenes.Browser;
@@ -13,14 +15,46 @@ partial class BrowserViewModel
 
     [ObservableProperty] private TabViewModel? _selectedTab = null;
     [ObservableProperty] private string _addressBarText = string.Empty;
+    private bool _isControlKeyDown = false;
     
     [RelayCommand]
     private void AddTab()
     {
-        var tab = new TabViewModel(AddressBarText);
+        var text = AddressBarText;
+        AddressBarText = string.Empty;
+        if (string.IsNullOrEmpty(text))
+        {
+            return;
+        }
+
+        if (_isControlKeyDown)
+        {
+            text = $"https://www.{text}.com";
+        }
+        else if (text.StartsWith("www.") && text.EndsWith(".com"))
+        {
+            text = $"https://{text}";
+        }
+        else if (!text.StartsWith("http://") && !text.StartsWith("https://"))
+        {
+            text = $"https://www.google.com/search?q={text}";
+        }
+
+        var tab = new TabViewModel(text);
         Tabs.Add(tab);
         SelectedTab = tab;
-        AddressBarText = string.Empty;
+    }
+
+    [RelayCommand]
+    private void OnSearchBoxKeyDown(KeyRoutedEventArgs e)
+    {
+        _isControlKeyDown = e.Key == VirtualKey.Control;
+    }
+
+    [RelayCommand]
+    private void OnSearchBoxKeyUp(KeyRoutedEventArgs e)
+    {
+        _isControlKeyDown = false;
     }
     
     [RelayCommand]
@@ -39,5 +73,11 @@ partial class BrowserViewModel
     private void Reload()
     {
         SelectedTab?.Reload();
+    }
+    
+    [RelayCommand]
+    private void ClearSelectedTab()
+    {
+        SelectedTab = null;
     }
 }

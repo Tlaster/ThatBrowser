@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using Windows.Graphics;
 using Microsoft.UI;
@@ -33,6 +34,8 @@ sealed partial class RootWindow : ModernWindow
             var titleBar = _window.TitleBar;
             titleBar.ExtendsContentIntoTitleBar = true;
             titleBar.ButtonBackgroundColor = Colors.Transparent;
+            titleBar.InactiveBackgroundColor = Colors.Transparent;
+            titleBar.ButtonInactiveBackgroundColor = Colors.Transparent;
         }
         else
         {
