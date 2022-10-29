@@ -2,20 +2,23 @@
     x:Class="ThatBrowser.UI.Scenes.Browser.BrowserScene"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:ThatBrowser.UI.Scenes"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:browser="using:ThatBrowser.UI.Scenes.Browser"
     xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
     xmlns:core="using:Microsoft.Xaml.Interactions.Core"
-    KeyDown="BrowserScene_OnKeyDown"
-    KeyUp="BrowserScene_OnKeyUp"
+    PreviewKeyDown="BrowserScene_OnKeyDown"
+    PreviewKeyUp="BrowserScene_OnKeyUp"
+    Loaded="BrowserScene_OnLoaded"
     mc:Ignorable="d">
     <UserControl.DataContext>
-        <browser:BrowserViewModel/>
+        <browser:BrowserViewModel />
     </UserControl.DataContext>
+    <UserControl.KeyboardAccelerators>
+        <KeyboardAccelerator Key="T" Modifiers="Control" Invoked="NewTabKeyboardAccelerator_OnInvoked"/>
+    </UserControl.KeyboardAccelerators>
     <Grid>
-        <SplitView 
+        <SplitView
             PanePlacement="Right"
             DisplayMode="CompactInline"
             PaneBackground="Transparent"
@@ -25,47 +28,50 @@
             <SplitView.Pane>
                 <Grid Background="Transparent">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="32"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
-                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="32" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
-                    <Grid HorizontalAlignment="Stretch" Loaded="OnSafeAreaElementEvent" SizeChanged="OnSafeAreaElementEvent">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition x:Name="RightPaddingColumn" Width="0"/>
-                        </Grid.ColumnDefinitions>
-                        <Rectangle Fill="Transparent" Name="DraggableArea1" Loaded="OnSafeAreaElementEvent" SizeChanged="OnSafeAreaElementEvent"/>
-                    </Grid>
-                    <Rectangle Fill="Transparent" Grid.Row="4" Name="DraggableArea2" Loaded="OnSafeAreaElementEvent" SizeChanged="OnSafeAreaElementEvent"/>
-                    <CommandBar IsOpen="False" DefaultLabelPosition="Collapsed" Grid.Row="1" IsDynamicOverflowEnabled="False" HorizontalAlignment="Center">
+                    <Rectangle Fill="Transparent" Name="DraggableArea1" Loaded="OnSafeAreaElementEvent"
+                               SizeChanged="OnSafeAreaElementEvent" />
+                    <Rectangle Fill="Transparent" Grid.Row="4" Name="DraggableArea2" Loaded="OnSafeAreaElementEvent"
+                               SizeChanged="OnSafeAreaElementEvent" />
+                    <CommandBar Opened="AppBar_OnOpened"
+                                Closed="AppBar_OnClosed"
+                                DefaultLabelPosition="Collapsed"
+                                Grid.Row="1"
+                                IsDynamicOverflowEnabled="False"
+                                HorizontalAlignment="Center">
                         <CommandBar.PrimaryCommands>
-                            <AppBarButton Icon="Back" Label="Back" Command="{Binding BackCommand}"/>
-                            <AppBarButton Icon="Forward" Label="Forward" Command="{Binding ForwardCommand}"/>
-                            <AppBarButton Icon="Refresh" Label="Refresh" Command="{Binding ReloadCommand}"/>
-                            <AppBarButton Icon="Add" Label="Add" Command="{Binding ClearSelectedTabCommand}"/>
+                            <AppBarButton Icon="Back" Label="Back" Command="{Binding BackCommand}" />
+                            <AppBarButton Icon="Forward" Label="Forward" Command="{Binding ForwardCommand}" />
+                            <AppBarButton Icon="Refresh" Label="Refresh" Command="{Binding ReloadCommand}" />
+                            <AppBarButton Icon="Add" Label="Add" Command="{Binding NewTabCommand}" />
                         </CommandBar.PrimaryCommands>
                         <CommandBar.SecondaryCommands>
-                            <AppBarButton Icon="Setting" Label="Settings"/>
+                            <AppBarButton Icon="Setting" Label="Settings" Click="Settings_Clicked" />
                         </CommandBar.SecondaryCommands>
                     </CommandBar>
-                    <ListView AllowDrop="True" CanReorderItems="True" Grid.Row="2" ItemsSource="{Binding Tabs}" SelectedItem="{Binding SelectedTab, Mode=TwoWay}">
+                    <ListView AllowDrop="True" 
+                              CanReorderItems="True"
+                              Grid.Row="2"
+                              ItemsSource="{Binding Tabs}"
+                              SelectedItem="{Binding SelectedTab, Mode=TwoWay}">
                         <ListView.ItemTemplate>
                             <DataTemplate>
                                 <Grid>
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto"/>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Text="{Binding Title}"/>
-                                    <Button Grid.Column="2" Style="{ThemeResource DateTimePickerFlyoutButtonStyle}">
+                                    <TextBlock Text="{Binding Title}" />
+                                    <Button Grid.Column="2" Style="{ThemeResource DateTimePickerFlyoutButtonStyle}" Command="{Binding CloseCommand}">
                                         <Viewbox Width="12" Height="12">
-                                            <SymbolIcon Symbol="Cancel"/>
+                                            <SymbolIcon Symbol="Cancel" />
                                         </Viewbox>
                                     </Button>
                                 </Grid>
@@ -78,39 +84,41 @@
                 <ContentPresenter.Content>
                     <Binding Path="SelectedTab.Content">
                         <Binding.FallbackValue>
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="2"/>
-                                </Grid.ColumnDefinitions>
-                                <Rectangle Grid.Column="1" Fill="{ThemeResource AppBarSeparatorForeground}"/>
-                                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                                    <TextBlock Text="That Browser" Style="{ThemeResource HeaderTextBlockStyle}" HorizontalAlignment="Center"/>
-                                    <Rectangle Height="32"/>
-                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
-                                        <AutoSuggestBox Width="400" Text="{Binding AddressBarText, Mode=TwoWay}" PlaceholderText="Search or input url...">
-                                            <AutoSuggestBox.QueryIcon>
-                                                <SymbolIcon Symbol="Find"/>
-                                            </AutoSuggestBox.QueryIcon>
-                                            <interactivity:Interaction.Behaviors>
-                                                <core:EventTriggerBehavior EventName="QuerySubmitted">
-                                                    <core:InvokeCommandAction Command="{Binding AddTabCommand}"/>
-                                                </core:EventTriggerBehavior>
-                                                <core:EventTriggerBehavior EventName="KeyDown">
-                                                    <core:InvokeCommandAction Command="{Binding OnSearchBoxKeyDownCommand}"/>
-                                                </core:EventTriggerBehavior>
-                                                <core:EventTriggerBehavior EventName="KeyUp">
-                                                    <core:InvokeCommandAction Command="{Binding OnSearchBoxKeyUpCommand}"/>
-                                                </core:EventTriggerBehavior>
-                                            </interactivity:Interaction.Behaviors>
-                                        </AutoSuggestBox>
-                                    </StackPanel>
-                                </StackPanel>
-                            </Grid>
+                            <Grid/>
                         </Binding.FallbackValue>
                     </Binding>
                 </ContentPresenter.Content>
             </ContentPresenter>
         </SplitView>
+        <StackPanel HorizontalAlignment="Center" 
+                    VerticalAlignment="Center" 
+                    Visibility="{Binding IsContentEmpty, Converter={StaticResource BoolToVisibilityConverter}}">
+            <TextBlock Text="That Browser"
+                       Style="{ThemeResource HeaderTextBlockStyle}"
+                       HorizontalAlignment="Center" />
+            <Rectangle Height="32" />
+            <StackPanel Orientation="Horizontal"
+                        HorizontalAlignment="Stretch">
+                <AutoSuggestBox Width="400"
+                                x:Name="MainAutoSuggestBox"
+                                Text="{Binding AddressBarText, Mode=TwoWay}"
+                                PlaceholderText="Search or input url...">
+                    <AutoSuggestBox.QueryIcon>
+                        <SymbolIcon Symbol="Find" />
+                    </AutoSuggestBox.QueryIcon>
+                    <interactivity:Interaction.Behaviors>
+                        <core:EventTriggerBehavior EventName="QuerySubmitted">
+                            <core:InvokeCommandAction Command="{Binding AddTabCommand}" />
+                        </core:EventTriggerBehavior>
+                        <core:EventTriggerBehavior EventName="PreviewKeyDown">
+                            <core:InvokeCommandAction Command="{Binding OnSearchBoxKeyDownCommand}" />
+                        </core:EventTriggerBehavior>
+                        <core:EventTriggerBehavior EventName="PreviewKeyUp">
+                            <core:InvokeCommandAction Command="{Binding OnSearchBoxKeyUpCommand}" />
+                        </core:EventTriggerBehavior>
+                    </interactivity:Interaction.Behaviors>
+                </AutoSuggestBox>
+            </StackPanel>
+        </StackPanel>
     </Grid>
 </UserControl>

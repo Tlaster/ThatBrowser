@@ -9,11 +9,14 @@ using ThatBrowser.UI.Hosting;
 namespace ThatBrowser.UI.Scenes.Browser;
 
 [ObservableObject]
-partial class BrowserViewModel
+partial class BrowserViewModel : ICloseTabHandler
 {
     public ObservableCollection<TabViewModel> Tabs { get; } = new();
 
-    [ObservableProperty] private TabViewModel? _selectedTab = null;
+    [ObservableProperty] 
+    [NotifyPropertyChangedFor(nameof(IsContentEmpty))]
+    private TabViewModel? _selectedTab = null;
+    public bool IsContentEmpty => _selectedTab is null;
     [ObservableProperty] private string _addressBarText = string.Empty;
     private bool _isControlKeyDown = false;
     
@@ -40,7 +43,7 @@ partial class BrowserViewModel
             text = $"https://www.google.com/search?q={text}";
         }
 
-        var tab = new TabViewModel(text);
+        var tab = new TabViewModel(text, this);
         Tabs.Add(tab);
         SelectedTab = tab;
     }
@@ -76,8 +79,14 @@ partial class BrowserViewModel
     }
     
     [RelayCommand]
-    private void ClearSelectedTab()
+    private void NewTab()
     {
         SelectedTab = null;
+    }
+
+    public void Close(TabViewModel tab)
+    {
+        Tabs.Remove(tab);
+        tab.Dispose();
     }
 }

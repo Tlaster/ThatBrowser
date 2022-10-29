@@ -100,6 +100,6 @@ sealed partial class RootWindow : ModernWindow
             _window.TitleBar.SetDragRectangles(areas);
         }
     }
-
+    
     public record SafeArea(int LeftTitleBar, int RightTitleBar, double ScaleAdjustment);
 }

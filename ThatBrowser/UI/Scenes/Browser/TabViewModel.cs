@@ -1,5 +1,6 @@
 ﻿using System;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.Web.WebView2.Core;
 
@@ -8,12 +9,14 @@ namespace ThatBrowser.UI.Scenes.Browser;
 [ObservableObject]
 internal partial class TabViewModel : IDisposable
 {
+    private readonly ICloseTabHandler _closeTabHandler;
     public WebView2 Content { get; } = new();
     [ObservableProperty]
     private string _title = string.Empty;
 
-    public TabViewModel(string url)
+    public TabViewModel(string url, ICloseTabHandler closeHandler)
     {
+        _closeTabHandler = closeHandler;
         Content.Source = new Uri(url);
         Content.CoreWebView2Initialized += ContentOnCoreWebView2Initialized;
     }
@@ -52,7 +55,7 @@ internal partial class TabViewModel : IDisposable
 
     private void CoreOnWindowCloseRequested(CoreWebView2 sender, object args)
     {
-        
+        _closeTabHandler.Close(this);
     }
 
     private void CoreOnNewWindowRequested(CoreWebView2 sender, CoreWebView2NewWindowRequestedEventArgs args)
@@ -64,9 +67,18 @@ internal partial class TabViewModel : IDisposable
     {
         args.Handled = true;
     }
+    
+    [RelayCommand]
+    private void Close() => _closeTabHandler.Close(this);
 
     public void Dispose()
     {
         Content.Close();
     }
+}
+
+
+internal interface ICloseTabHandler
+{
+    void Close(TabViewModel tab);
 }
